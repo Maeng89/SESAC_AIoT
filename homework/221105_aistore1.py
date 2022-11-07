@@ -12,14 +12,16 @@ class AiStore:
         self.price = price
 
     def buy_item(self, b_count, input_amount):
-        self.count -= b_count
-        need_amount = self.price * b_count
-        balance = need_amount - input_amount
-        print(f'잔돈은 {balance}입니다.')
-        if self.count < 0 :
-            print(f'재고가 {self.count}만큼 부족합니다.')
-        elif input_amount < need_amount :
-            print(f'입력 금액이 {balance}만큼 부족합니다.')
+        if (self.count - b_count) < 0: # 재고 부족시
+            print(f'구매 실패, 재고가 {abs(self.count - b_count)}개 부족합니다.')
+        else : # 재고 충분시
+            need_amount = self.price * b_count
+            balance = abs(input_amount - need_amount)
+            if input_amount < need_amount: # 금액 부족시
+                print(f'구매 실패, 금액이 {balance}만큼 부족합니다.')
+            else : # 금액 충분시 결제 완료
+                self.count -= b_count
+                print(f'구매 성공, 잔돈은 {balance}원이고, 남은 재고는 {self.count}입니다.')
 
     def get_name(self):
         return self.name
@@ -59,11 +61,10 @@ if __name__ == '__main__':
 
         elif num == '2':
             count = int(input('구매할 상품 개수 입력'))
-            print(f'구매 상품 개수는 {count}입니다.')
             need_price = store.get_price() * count
-            print(f'구매 필요 금액은 {need_price}입니다.')
-            amount = input(str(need_price) + ' 금액을 입금해 주세요')
-            store.buy_item(count, need_price)
+            print(f'상품울 {count}개 구매 시 필요 금액은 {need_price}입니다.')
+            amount = int(input('금액을 입금해 주세요'))
+            store.buy_item(count, amount)
 
         elif num == '3':
             p_stock = int(input('상품 개수 입력'))
