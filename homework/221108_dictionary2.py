@@ -1,3 +1,4 @@
+import copy
 # users: 유저의 정보가 유저id를 키값으로 하여 저장되어있는 딕셔너리
 users = {123:['최원칠','관악구'],
          124:['이서혁','구로구'],
@@ -37,21 +38,31 @@ print(products_list)
 print(locate_list)
 print('='*50)
 
-# 프로덕트 매핑??
-for i in range(len(products_list)):
-    for j in range(len(products_list[i])):
-        # print(products_list[i][j])
-        products_list[i][j] = products[products_list[i][j]]['name']
-        # print(products_list[i][j])
+# 프로덕트 이름 가져오기
+products_name = copy.deepcopy(products_list)
+for i in range(len(products_name)):
+    for j in range(len(products_name[i])):
+        products_name[i][j] = products[products_name[i][j]]['name']
 print(products_list)
+print(products_name)
 print('='*50)
 
 # 지역구 : [(이름,상품), (이름, 상품)]  합쳐서 딕셔너리로 변환
 # 포인트 : 지역구 기준,  , 주문 순서 주의(유저아이디 섞여있음), 튜플 컨프리핸션
 for i in range(len(locate_list)):
     if locate_list[i] not in delivery.keys(): # 딕셔너리에 없는 키에 대한 밸류 입력
-        delivery[locate_list[i]] = [(name_list[i], products_list[i][j]) for j in range(len(products_list[i]))]
+        delivery[locate_list[i]] = [(name_list[i], products_name[i][j]) for j in range(len(products_name[i]))
+                                    # 재고 체크 조건, 카운팅 기능 없음
+                                    if products_name[i][j] == products[products_list[i][j]]['name']
+                                        and products[products_list[i][j]]['count'] > 0
+                                    ]
+
     else: # 딕셔너리에 있는 키에 대한 밸류 추가(딕셔너리변환시 동일한 키가 중복될 경우 set되기 때문에, 누락된 밸류를 다시 추가해준다)
-        delivery[locate_list[i]] += [(name_list[i], products_list[i][j]) for j in range(len(products_list[i]))]
+        delivery[locate_list[i]] += [(name_list[i], products_name[i][j]) for j in range(len(products_name[i]))
+                                     # 재고 체크 조건, 카운팅 기능 없음
+                                     if products_name[i][j] == products[products_list[i][j]]['name']
+                                        and products[products_list[i][j]]['count'] > 0
+                                     ]
+
 print(delivery)
 print('='*50)
