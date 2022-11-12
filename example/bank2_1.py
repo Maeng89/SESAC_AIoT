@@ -175,12 +175,13 @@ def customer_to_json():
     # 'total_amount': 0, 'accounts': {'1251': 0}} ...],
     all_data = []
     for c in customer_list:
-        c_dict = {}
-        c_dict['name'] = c.get_name()
-        c_dict['c_id'] = c.get_id()
-        c_dict['rating'] = c.get_rat()
-        c_dict['total_amount'] = c.get_total_amount1()
-        c_dict['accounts'] = c.get_all_accounts()
+        c_dict = {
+            'name': c.get_name(),
+            'c_id': c.get_id(),
+            'rating': c.get_rat(),
+            'total_amount': c.get_total_amount1(),
+            'accounts': c.get_all_accounts()
+        }
         all_data.append(c_dict)
         print(c_dict)
     print(all_data)
