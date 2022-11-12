@@ -9,7 +9,7 @@ class Customer:
     # 계좌 딕셔너리에 계좌 추가 (0으로 초기화)
     def add_account(self, account, amount=0):
         if account in self.accounts:
-            print(f'{}계좌는 이미 존재합니다.')
+            print(f'{account}계좌는 이미 존재합니다.')
         else :
             self.accounts = {account : amount}
 
