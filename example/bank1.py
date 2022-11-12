@@ -15,6 +15,7 @@ class Customer:
             print('잔액이 부족합니다.')
         else :
             self.amount -= sub
+
     def get_name(self):
        return self.name
 
@@ -75,3 +76,4 @@ if __name__ == '__main__': # 메인함수의 선언, 시작을 의미
                 break
             else:
                 print('잘못된 입력입니다')
+
