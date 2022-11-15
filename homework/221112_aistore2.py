@@ -5,23 +5,27 @@ class AiStore:
         self.s_id = s_id
         self.locate = locate
         self.products = {'커피' : 10}
-        self.prices = 0
+        self.prices = {'커피' : 2000}
 
     def set_product(self, product, count, price):
-        self.products[product] = int(count)
-        self.prices = int(price)
+        if product in self.products :
+            self.products[product] += int(count)
+            self.prices[product] = int(price)
+        else :
+            self.products[product] = int(count)
+            self.prices[product] = int(price)
 
     def buy_product(self, product, buy_count, buy_price):
         if self.products[product] < 0: # 재고 부족시
             print(f'구매 실패, 재고가 {abs(self.products[product] - buy_count)}개 부족합니다.')
         else : # 재고 충분시
-            need_amount = self.prices * buy_count
-            balance = abs(buy_price - need_amount)
+            need_amount = self.prices[product] * buy_count
+            change = abs(buy_price - need_amount)
             if buy_price < need_amount: # 금액 부족시
-                print(f'구매 실패, 금액이 {balance}만큼 부족합니다.')
+                print(f'구매 실패, 금액이 {change}만큼 부족합니다.')
             else : # 금액 충분시 결제 완료
                 self.products[product] -= buy_count
-                print(f'구매 성공, 잔돈은 {balance}원이고, 남은 재고는 {self.products[product]}입니다.')
+                print(f'구매 성공, 잔돈은 {change}원이고, 남은 재고는 {self.products[product]}입니다.')
 
     def get_name(self):
         return self.name
@@ -63,6 +67,7 @@ def search_store(s_id):
                           store.get_id()
                           ))
             return store
+        # 포문을 계속 돌기 위해 else 생략
     print('스토어 아이디를 찾지 못했습니다.')
     return None
 
@@ -109,6 +114,7 @@ def txt_to_store():
     input_path = input('txt파일 불러오기 경로 입력') # ./221112_stores.txt
     try : # 오류 모니터링 영역
         f = open(input_path, 'r', encoding='utf-8')
+    # with open(input_path, 'r',  encoding='utf-8'0 as f: # with는 close선언 생략 가능
     except : #???
         print('스토어 정보 텍스트 파일 불러오기 실패')
     else : # 코드 실행 영역
