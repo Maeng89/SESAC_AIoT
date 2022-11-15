@@ -110,10 +110,8 @@ def create_acount():
                   acount_num,
                   ))
 
-
 def show_customer():
-    print('고객 번호 입력:')
-    c_id = input()
+    c_id = input('고객 번호 입력:')
     customer = search_customer(c_id)
     if customer is None:
         return
@@ -126,16 +124,12 @@ def show_customer():
                   ))
 
 def deposit():
-    print('고객 번호 입력:')
-    c_id = input()
+    c_id = input('고객 번호 입력:')
     customer = search_customer(c_id)
     if customer is None:
         return
-
-    print('계좌번호 입력:')
-    acount_num = input()
-    print('입금할 금액 입력:')
-    amount = input()
+    acount_num = input('계좌번호 입력:')
+    amount = input('입금할 금액 입력:')
     customer.add_amount(acount_num, int(amount))
 
 def withdraw():
@@ -152,7 +146,7 @@ def withdraw():
     customer.sub_amount(acount_num, int(amount))
 
 def txt_to_customers():
-    input_path = input('파일 저장 경로 입력') # ./customers.txt
+    input_path = input('텍스트 파일 불러오기 경로 입력') # ./customers.txt
     try : # 오류 모니터링 영역
         f = open(input_path, 'r', encoding='utf-8')
     except : #???
@@ -189,7 +183,7 @@ def customer_to_json():
     # 입력받은 Path로 json저장하기
     # 계좌 생성 옵션 최소 2번 이상 실행 후, 해당 계좌가 들어간 상태로 저장되어야함
     try : # 오류 모니터링 영역
-        input_path = input('파일 저장 경로 입력')
+        input_path = input('json 파일 저장 경로 입력')
     except:  # ???
         print(f'고객 정보 json파일 저장 실패')
     else:  # 코드 실행 영역
