@@ -7,17 +7,42 @@ class Customer:
         self.customer = customer # series
         self.accounts = accounts # dataframe
 
+    def add_account(self, a_id):# id = 계좌번호
+        if a_id in self.accounts[self.accounts.index]:
+            print('해당 계좌가 이미 존재합니다')
+        else:
+            #  새로운 계좌 데이터 할당
+            self.accounts.append({'a_id': a_id,
+                                  'password': None,
+                                  'c_id': None,
+                                  'amount': 0
+                                  }, ignore_index = True)
+
+            # 고객 계좌 개수 추가
+            # self.customer['account_num'].loc[a_id] += 1
+
     def add_amount(self, a_id, amount):
-        ~
+        # 해당 계좌번호의 계좌금액에 입금금액 추가
+        self.accounts['amount'].loc[a_id] += amount
+
+        # 고객의 총합금액과 등급 업데이트
+        # self.customer[]
 
     def sub_amount(self, a_id, amount):
-        ~
+        # 해당 계좌번호의 계좌금액에서 출금금액 차감
+        self.accounts['amount'].loc[a_id] -= amount
 
-    def add_account(self, a_id):
-        ~
+        # 고객의 총합금액과 등급 업데이트
+        # self.customer[]
 
-    def get_total_amount(self,):
-        ~
+    def get_total_amount(self, c_id):
+        # 고객의 모든 계좌의 총합 금액을 반환
+        #total_amount = self.customer['total_amount'].loc[c_id]
+        return total_amount
+
+    def update(self, c_df, a_df):
+        # 클래스 내 수정된 데이터를 고객 데이터 프레임에 업데이트?
+        # ??
 
     def get_rat(self):
         total_amount = self.get_total_amount()
@@ -31,11 +56,8 @@ class Customer:
             rat = 'silver'
         else:
             rat = 'bronze'
-
         return rat
 
-    def update(self, c_df, a_df):
-        ~
     def get_name(self):
         return self.customer['name']
 
@@ -52,23 +74,35 @@ class Customer:
 def create_customer():
     c_name = input('고객 이름 입력:')
     c_id = input('고객 번호 입력:')
-
-    ~
-    # c_df.loc[c_df['c_id'] == c_id] = customer
+    customer = {'c_id': c_id,
+                'name': c_name,
+                'account_num': 0,
+                'total_amount': 0,
+                'rat': 'normal'
+                }
+    c_df.loc[c_df['c_id'] == c_id] = customer
     # pd.concat([c_df, pd.DataFrame([customer])], ignore_index=False)
     print('{} 고객이 생성 되었습니다.'.format(c_name))
-
+    return c_df
 
 def show_list():
-    for customer in ~:
+    for customer in customer_obj_list:
         print('고객이름:{} 고객번호:{}'
-              .format(customer['name'],
-                      customer['c_id'],
+              .format(customer.get_name(),
+                      customer.get_cid(),
                       ))
 
-
 def search_customer(c_id):
-    ~
+    for customer in customer_obj_list:
+        if customer.get_cid() == c_id:
+            print('고객이름:{} 고객번호:{}'
+                  .format(customer.get_name(),
+                          customer.get_id()
+                          ))
+            return customer
+
+    print('고객 번호를 찾지 못했습니다.')
+    return None
 
 
 def create_acount():
@@ -126,15 +160,50 @@ def ca_merge():
 def group_rat_count():
     ~
 
+def csv_to_customers():
+    input_path = input('고객 csv파일 불러오기 경로 입력') # bank3_customers.csv
+    try : # 오류 모니터링 영역
+        c_df = pd.read_csv(input_path)
+    except :
+        print(f'고객 csv파일 불러오기 실패')
+    else : # 코드 실행 영역
+        c_df.set_index('c_id', inplace=True)
+        print(c_df)
+        print(f'고객 csv파일 불러오기 성공')
 
+def csv_to_accounts():
+    input_path = input('계좌 csv파일 불러오기 경로 입력') # bank3_customers.csv
+    try : # 오류 모니터링 영역
+        a_df = pd.read_csv(input_path)
+    except :
+        print(f'계좌 csv파일 불러오기 실패')
+    else : # 코드 실행 영역
+        a_df.set_index('a_id', inplace=True)
+        print(a_df)
+        print(f'계좌 csv파일 불러오기 성공')
+
+
+
+#         for c_idx in c_df.index: # 고객 객체 생성 및 목록 추가
+#             c_obj = Customer(c_df[c_idx])
+#             customer_obj_list.append(c_obj)
 
 if __name__ == '__main__':
+    customer_obj_list = []
+###### 고객/계좌 데이터 준비(csv to dataframe) ######
+    c_df = pd.read_csv('bank3_customers.csv', index_col='c_id')
+    # c_df.set_index('c_id', inplace=True)
+    print('고객 csv파일 불러오기 성공')
+    print(f'고객 데이터({c_df.dtypes}) 준비 완료')
+    print(c_df)
+    print('='*50)
 
-    ~
-    print(c_df.dtypes)
-    ~
-    print(a_df.dtypes)
-
+    a_df = pd.read_csv('bank3_accounts.csv', index_col='a_id')
+    # a_df.set_index('a_id', inplace=True)
+    print(f'계좌 데이터({c_df.dtypes}) 준비 완료')
+    print(a_df)
+    print('=' * 50)
+###### 뱅킹 메뉴 안내 ######
     print('1 - 고객 생성')
     print('2 - 계좌 생성')
     print('3 - 입금')
@@ -149,25 +218,26 @@ if __name__ == '__main__':
     while True:
         print('--'*30)
         input1 = input('옵션을 입력해 주세요')
-        if input1 == '1':
-            create_customer()
-        elif input1 == '2':
+        if input1 == '1': # 고객 생성
+            customer = create_customer()
+            customer_obj_list.append(customer) # 고객 객체 리스트
+        elif input1 == '2': # 계좌 생성
             create_acount()
-        elif input1 == '3':
+        elif input1 == '3': # 입금
             deposit()
-        elif input1 == '4':
+        elif input1 == '4': # 출금
             withdraw()
-        elif input1 == '5':
+        elif input1 == '5': # 생성된 고객 리스트 출력
             show_list()
-        elif input1 == '6':
+        elif input1 == '6': # 고객 정보 출력
             show_customer()
-        elif input1 == '7':
-            ~
-        elif input1 == '8':
-            ~
-        elif input1 == '9':
+        elif input1 == '7': # csv 파일로 고객 정보 출력
+            # csv_to_customers()
+        elif input1 == '8': # csv 파일로 계좌 정보 출력
+            # csv_to_accounts()
+        elif input1 == '9': # csv 파일로 고객 - 계좌 정보 출력
             ca_merge()
-        elif input1 == '10':
+        elif input1 == '10': # 등급별 고객의 명수 출력
             group_rat_count()
 
         else:
