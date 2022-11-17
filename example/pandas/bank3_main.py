@@ -171,6 +171,7 @@ def withdraw():
     amount = input('출금할 금액 입력:')
     ~
 
+
 def ca_merge():
     ~
 
