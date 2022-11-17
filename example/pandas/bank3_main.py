@@ -12,37 +12,53 @@ class Customer:
             print('해당 계좌가 이미 존재합니다')
         else:
             #  새로운 계좌 데이터 할당
-            self.accounts.append({'a_id': a_id,
-                                  'password': None,
-                                  'c_id': None,
-                                  'amount': 0
-                                  }, ignore_index = True)
+            # 데이터프레임에 딕셔너리를 추가하려면 dict to df 하거나 dict to series(name할당)로 가능
+            new_account_dict = {'a_id': a_id,
+                              'password': None,
+                              'c_id': self.customer['c_id'],
+                              'amount': 0
+                              }
+            new_account_df = pd.DataFrame([new_account_dict])
+            new_account_df.set_index('a_id', inplace=True)
+            self.accounts.append(new_account_df)
 
             # 고객 계좌 개수 추가
-            # self.customer['account_num'].loc[a_id] += 1
+            self.customer['account_num'] += 1
+            # 데이터베이스 업데이트
+            self.update(c_df, a_df)
 
     def add_amount(self, a_id, amount):
         # 해당 계좌번호의 계좌금액에 입금금액 추가
         self.accounts['amount'].loc[a_id] += amount
-
+        # self.accounts.loc[aid, 'amount']
         # 고객의 총합금액과 등급 업데이트
-        # self.customer[]
+        self.customer['total_amount'] = self.get_total_amount()
+        self.customer['rat'] = self.get_rat()
+
+        # 데이터베이스 업데이트
+        self.update(c_df, a_df)
 
     def sub_amount(self, a_id, amount):
         # 해당 계좌번호의 계좌금액에서 출금금액 차감
         self.accounts['amount'].loc[a_id] -= amount
 
         # 고객의 총합금액과 등급 업데이트
-        # self.customer[]
+        self.customer['total_amount'] = self.get_total_amount()
+        self.customer['rat'] = self.get_rat()
 
-    def get_total_amount(self, c_id):
+        # 데이터베이스 업데이트
+        self.update(c_df, a_df)
+
+    def get_total_amount(self):
         # 고객의 모든 계좌의 총합 금액을 반환
-        #total_amount = self.customer['total_amount'].loc[c_id]
+        total_amount = self.customer['total_amount']
         return total_amount
 
     def update(self, c_df, a_df):
-        # 클래스 내 수정된 데이터를 고객 데이터 프레임에 업데이트?
-        # ??
+        # 클래스 내 수정된  데이터를 데이터 프레임에 업데이트
+        c_df.loc[c_df['c_id'] == self.customer['c_id']] = self.customer
+        a_df.loc[a_df['a_id'] == self.accounts['a_id']] = self.accounts
+        # ad_df.update(self.account) 인덱스 같으면 업데이트하고 다르면 추가
 
     def get_rat(self):
         total_amount = self.get_total_amount()
@@ -80,7 +96,7 @@ def create_customer():
                 'total_amount': 0,
                 'rat': 'normal'
                 }
-    c_df.loc[c_df['c_id'] == c_id] = customer
+    c_df.loc[c_id] = customer
     # pd.concat([c_df, pd.DataFrame([customer])], ignore_index=False)
     print('{} 고객이 생성 되었습니다.'.format(c_name))
     return c_df
@@ -92,14 +108,16 @@ def show_list():
                       customer.get_cid(),
                       ))
 
-def search_customer(c_id):
-    for customer in customer_obj_list:
-        if customer.get_cid() == c_id:
-            print('고객이름:{} 고객번호:{}'
-                  .format(customer.get_name(),
-                          customer.get_id()
-                          ))
-            return customer
+def search_customer(c_id): # 객체 목록이 아니라, 데이터 프레임으로 데이터를 가져올 수 있도록.
+    # for customer in customer_obj_list:
+    #     if customer.get_cid() == c_id:
+    #         print('고객이름:{} 고객번호:{}'
+    #               .format(customer.get_name(),
+    #                       customer.get_id()
+    #                       ))
+    # customer =
+    # account =
+            return Customer(customer, account)
 
     print('고객 번호를 찾지 못했습니다.')
     return None
@@ -160,27 +178,27 @@ def ca_merge():
 def group_rat_count():
     ~
 
-def csv_to_customers():
-    input_path = input('고객 csv파일 불러오기 경로 입력') # bank3_customers.csv
-    try : # 오류 모니터링 영역
-        c_df = pd.read_csv(input_path)
-    except :
-        print(f'고객 csv파일 불러오기 실패')
-    else : # 코드 실행 영역
-        c_df.set_index('c_id', inplace=True)
-        print(c_df)
-        print(f'고객 csv파일 불러오기 성공')
-
-def csv_to_accounts():
-    input_path = input('계좌 csv파일 불러오기 경로 입력') # bank3_customers.csv
-    try : # 오류 모니터링 영역
-        a_df = pd.read_csv(input_path)
-    except :
-        print(f'계좌 csv파일 불러오기 실패')
-    else : # 코드 실행 영역
-        a_df.set_index('a_id', inplace=True)
-        print(a_df)
-        print(f'계좌 csv파일 불러오기 성공')
+# def csv_to_customers():
+#     input_path = input('고객 csv파일 불러오기 경로 입력') # bank3_customers.csv
+#     try : # 오류 모니터링 영역
+#         c_df = pd.read_csv(input_path)
+#     except :
+#         print(f'고객 csv파일 불러오기 실패')
+#     else : # 코드 실행 영역
+#         c_df.set_index('c_id', inplace=True)
+#         print(c_df)
+#         print(f'고객 csv파일 불러오기 성공')
+# 
+# def csv_to_accounts():
+#     input_path = input('계좌 csv파일 불러오기 경로 입력') # bank3_customers.csv
+#     try : # 오류 모니터링 영역
+#         a_df = pd.read_csv(input_path)
+#     except :
+#         print(f'계좌 csv파일 불러오기 실패')
+#     else : # 코드 실행 영역
+#         a_df.set_index('a_id', inplace=True)
+#         print(a_df)
+#         print(f'계좌 csv파일 불러오기 성공')
 
 
 
@@ -191,15 +209,15 @@ def csv_to_accounts():
 if __name__ == '__main__':
     customer_obj_list = []
 ###### 고객/계좌 데이터 준비(csv to dataframe) ######
-    c_df = pd.read_csv('bank3_customers.csv', index_col='c_id')
-    # c_df.set_index('c_id', inplace=True)
+    c_df = pd.read_csv('bank3_customers.csv') # index_col은 인덱스로 활용된 칼럼이 삭제됨
+    c_df.set_index('c_id', drop = False, inplace=True) # drop=false는 인덱스로 활용된 칼럼 유지
     print('고객 csv파일 불러오기 성공')
     print(f'고객 데이터({c_df.dtypes}) 준비 완료')
     print(c_df)
     print('='*50)
 
-    a_df = pd.read_csv('bank3_accounts.csv', index_col='a_id')
-    # a_df.set_index('a_id', inplace=True)
+    a_df = pd.read_csv('bank3_accounts.csv')
+    a_df.set_index('a_id', drop = False, inplace=True)
     print(f'계좌 데이터({c_df.dtypes}) 준비 완료')
     print(a_df)
     print('=' * 50)
@@ -232,7 +250,7 @@ if __name__ == '__main__':
         elif input1 == '6': # 고객 정보 출력
             show_customer()
         elif input1 == '7': # csv 파일로 고객 정보 출력
-            # csv_to_customers()
+            # csv_to_customers() # index false 처리
         elif input1 == '8': # csv 파일로 계좌 정보 출력
             # csv_to_accounts()
         elif input1 == '9': # csv 파일로 고객 - 계좌 정보 출력
