@@ -35,8 +35,10 @@ class AiStore:
 
     def update_data(self, s_df, iv_df):
         ~
+        # 이 경우는 데이터파일과 인벤토리를 따로 업데이트해야함
 def create_store():
     s_name = input('스토어 이름 입력: ')
+
     s_id = input('스토어 번호 입력: ')
     locate = input('스토어 위치 입력: ')
     ~
