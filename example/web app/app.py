@@ -18,7 +18,7 @@ def index():
         elif op == '1':
             return redirect(url_for('capage'))
         elif op == '2':
-            ~
+            pass
         elif op == '3':
             return redirect(url_for('viewpage'))
 
@@ -55,11 +55,11 @@ def dwpage(c_id ='nan', a_num = 'nan'):
         # 고객 아이디로 고객인스턴스 생성
         # 입출금 옵션이 입금이면 고객인스턴스에서 입금함수 실행 아니면 출금함수 실행
         # 데이터 업데이트
-        ~
+        #
 
         return redirect(url_for('index'))
 
-    return ~
+    return #
 
 @app.route("/viewpage", methods=['POST', 'GET'])
 def viewpage():
