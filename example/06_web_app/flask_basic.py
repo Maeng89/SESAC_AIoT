@@ -1,3 +1,4 @@
+# 유튜브 생활코딩 플라스크 프레임워크 참고
 from flask import Flask, request, redirect
 import random
 app = Flask(__name__)
