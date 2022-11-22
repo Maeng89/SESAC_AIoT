@@ -19,7 +19,6 @@ class Customer(Base):
     def add_account(self):
         self.account_num += 1
 
-
     def add_amount(self, amount):
         self.total_amount += amount
         self.set_rat()
@@ -68,7 +67,7 @@ class Accounts(Base):
 def show_list():
     result = []
     # 데이터베이스의 모든 고객을 쿼리
-    customers = ~
+    customers = Customer.query.all()
     for c in customers:
         result.append([c.name, c.c_id ,c.rat, c.total_amount])
     print(result)
@@ -81,7 +80,7 @@ def show_customer(customer):
                      customer.rat,
                      customer.total_amount]]
     # 고객 아이디에 해당하는 계좌인스턴스 쿼리
-    accounts = ~
+    accounts = Accounts.query.filter(Customer.c_id)
     account_view = []
     for account in accounts:
         account_view.append(account)
@@ -93,7 +92,7 @@ def show_customer(customer):
 def create_customer(c_id , c_name):
     if db_session.get(Customer, c_id) is None:
         # 고객 인스턴스 생성 -> 데이터베이스에 add -> commit
-        ~
+
 
 def create_acount(customer: Customer, a_id):
     # 고객 인스턴스에 함수를 활용하여 account_num 증가
