@@ -47,7 +47,7 @@ class Customer(Base):
 class Accounts(Base):
     __tablename__ = 'accounts'
     a_id = Column(String(20), primary_key=True)
-    c_id = Column(String(50), ForeignKey(Customer.c_id), unique= True)
+    c_id = Column(String(50), ForeignKey(Customer.c_id))
     amount = Column(Integer)
 
     def __init__(self, a_id, c_id):
