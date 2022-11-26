@@ -55,7 +55,7 @@ class AiStore:
     def update_data(self, s_df, iv_df):
         ~
         
-############ 커머스 모듈 프로세스 ############
+############ 스토어 모듈 프로세스 ############
 def create_store():
     s_name = input('스토어 이름 입력: ')
     s_id = input('스토어 번호 입력: ')
@@ -65,7 +65,8 @@ def create_store():
 
 
 def show_list():
-    ~
+    for store in s_df.iloc:
+        print(f'스토어 이름:{store["name"]} 스토어 아이디:{store["s_id"]} 스토어 위치:{store["locate"]}')
 
 def search_store(s_id):
     ~
