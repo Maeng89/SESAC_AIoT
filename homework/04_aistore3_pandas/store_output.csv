@@ -1,5 +1,5 @@
-s_id,name,locate,products_num
-s1,용산점,용산,6.0
-s2,강남점,강남,3.0
-s3,강북점,강북,4.0
-s9,ㅂㅈㄷ,asd,
+s_id,name,locate,products_num,s1
+s1,용산점,용산,6,
+s2,강남점,강남,3,
+s3,강북점,강북,4,
+s9,qwe,asd,0,
