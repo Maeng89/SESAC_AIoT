@@ -18,9 +18,9 @@ class AiStore:
     def set_product(self, p_id, count, price):
         pass
 
-
     def is_product(self, p_id):
         pass
+
     def buy_product(self, p_id, count, amount):
         pass
 
@@ -38,6 +38,7 @@ class AiStore:
 
     def get_inventory(self):
         return self.inventory
+
     def get_menu(self, p_df):
         # {'p_name': p_name, 'price': int(price), 'count': int(count), 'p_id':p_id} 이 여러개
         pass
@@ -59,10 +60,19 @@ def create_store(s_id, s_name, locate):
 
 
 def show_list(s_id = None):
-    if s_id is None:
-        ~
+    # html이 리스트로 받으니 리스트로 보내주
+    stores = []
+    if s_id :
+        store = s_df.loc[s_id]
+        store_pid = iv_df.loc[iv_df['s_id'] == store['s_id'], 'p_id']  # 스토어별 등록상품 아이디
+        stores.append([store['name'], store['s_id'], store['locate'], list(p_df.loc[store_pid, "product"])])
+        # print(stores)
     else:
-        ~
+        for store in s_df.iloc :
+            store_pid = iv_df.loc[iv_df['s_id'] == store['s_id'], 'p_id']  # 스토어별 등록상품 아이디
+            stores.append([store['name'],store['s_id'],store['locate'],list(p_df.loc[store_pid, "product"])])
+            # print(stores)
+    return stores
 
 def search_store(s_id):
     print(s_id)
@@ -93,9 +103,6 @@ def add_product(p_id, price, count, s_id ):
 
 def update(s_id):
     pass
-
-
-
 
 def bucket(s_id, p_id, count):
     store = search_store(s_id)
