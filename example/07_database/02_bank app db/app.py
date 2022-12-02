@@ -43,7 +43,7 @@ def capage():
         c_id = form.c_id.data
         a_num = form.a_num.data
         customer = db_session.get(Customer, c_id)
-        create_acount(customer, a_num)
+        create_account(customer, a_num)
         return redirect('/')
 
     return render_template('capage.html', form=form)
@@ -69,8 +69,8 @@ def dwpage(c_id ='nan', a_num = 'nan'):
 def viewpage():
     if request.method == 'POST':
         c_id = request.form['inputCId']
-        costomer = db_session.get(Customer, c_id)
-        customer_view, accounts_view = show_customer(costomer)
+        c = db_session.get(Customer, c_id)
+        customer_view, accounts_view = show_customer(c)
 
         return render_template('viewpage.html',
                                customers=customer_view,
