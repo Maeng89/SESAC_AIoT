@@ -30,7 +30,7 @@ class Customer:
             if self.accounts[a_id]['amount'] > amount:
                 self.accounts[a_id]['amount'] -= amount
                 self.total_amount = self.get_total_amount()
-                self.rat['rat'] = self.get_rat()
+                self.rat = self.get_rat()
             else:
                 print('계좌의 금액이 부족합니다.')
         else:
@@ -108,7 +108,7 @@ def show_list():
     return result
 
 def search_customer(c_id):
-
+    print(bank)
     if c_id in bank:
         customer = copy.copy(bank[c_id])
         return Customer(customer)

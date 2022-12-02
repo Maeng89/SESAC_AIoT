@@ -64,8 +64,7 @@ def dwpage(c_id ='nan', a_num = 'nan'):
         # 데이터 업데이트
         c_id = request.form['cId']
         a_num = request.form['aNum']
-        amount = request.form['amount']
-        amount = int(amount)
+        amount = int(request.form['amount'])
         customer = search_customer(c_id)
 
         if request.form['option'] == '0':
@@ -75,7 +74,7 @@ def dwpage(c_id ='nan', a_num = 'nan'):
 
         update(customer)
 
-        return redirect(url_for('index'))
+        return redirect(url_for('viewpage'))
 
     return render_template('dwpage.html', c_id=c_id, a_num=a_num)
 
