@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% ~ %}
+{% block content %}
     <div class="py-3 text-center">
         <div class="col-lg-6 mx-auto">
             <h2>스토어 목록</h2>
@@ -28,15 +28,15 @@
             </tr>
         </thead>
         <tbody>
-        {% ~ %}
+        {% for s in stores %}
             <tr>
-                <th scope="row">{{ s.s_id }}</th>
-                <td>{{ ~ }}</td>
-                <td>{{ ~ }}</td>
-                <td>{{ ~ }}</td>
+                <th scope="row">{{ s[1] }}</th>
+                <td>{{ s[0] }}</td>
+                <td>{{ s[2] }}</td>
+                <td>{{ s[3] }}</td>
             </tr>
-        {% ~ %}
+        {% endfor %}
         </tbody>
     </table>
 
-{% ~ %}
+{% endblock %}
