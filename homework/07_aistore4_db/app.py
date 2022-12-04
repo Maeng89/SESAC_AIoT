@@ -4,12 +4,7 @@ from aistoremodel import *
 import datetime
 from wtforms import Form, StringField, PasswordField, TextAreaField, validators
 
-
-
-# 수정할 것 : resetDB.py, aistoremodel.py, app.py
-
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = 'aiot'
 
 @app.before_request
@@ -48,6 +43,7 @@ def manage(s_id = 'nan'):
         if s_id == 'nan':
             s_id = request.form['sId']
             # Products 전체 쿼리 (리스트)
+            s
             products = ~
             return render_template('manage.html',
                                     s_id = s_id,
