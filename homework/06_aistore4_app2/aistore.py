@@ -1,3 +1,10 @@
+## 참고 사항 ##
+# get_menu 클래스 메서드는 해당 스토어의 상품 정보로서 manage에서 사용됨
+# get_product 클래스 메서드는 해당 상품아이디의 상품 정보로서 buy에서 사용됨
+# get_products 함수는 데이터베이스에 존재하는 전체 상품 재고 정보로 manage에서 사용됨
+# ㄴ 이름이 헷갈리니까 get_products_catalog로 수정함
+# 데이터베이스 업데이트는 set_product()와 buy_product()와 함께 app에서 사용하자
+
 import pandas as pd
 
 s_df = pd.read_csv('./static/stores.csv')
@@ -22,11 +29,14 @@ class AiStore:
         return n_product
 
     def set_product(self, p_id, count, price):
-        # 해당하는 상품의 가격과 수량 값 변경
-        product =  self.inventory[self.inventory['p_id'] == p_id]
-        product['count'] += count
-        product['price'] = price
-        self.inventory.update(product)
+        if p_id not in self.inventory['p_id']:
+            return print('없는 제품 아이디 입니다. 하단 카탈로그를 참고해주세요.')
+        else:
+            # 해당하는 상품의 가격과 수량 값 변경
+            product =  self.inventory[self.inventory['p_id'] == p_id]
+            product['count'] += count
+            product['price'] = price
+            self.inventory.update(product) # 데이터베이스 업데이트 아님
 
     def is_product(self, p_id):
         # 해당 id의 상품의 db유무 체크
@@ -40,11 +50,12 @@ class AiStore:
 
         product =  self.inventory[self.inventory['p_id'] == p_id]
         product = product[product['count'] > count]
-        if len(product) == 0:
+        if len(product) == 0: # 금액 부족 케이스
+            print('금액이 부족합니다.')
             return
-
+        # 금액 충분 케이스
         product['count'] -= count
-        self.inventory.update(product)
+        self.inventory.update(product) # 데이터베이스 업데이트 아님
 
     def get_name(self):
         return self.name
@@ -61,22 +72,26 @@ class AiStore:
     def get_inventory(self):
         return self.inventory
 
-    def get_menu(self): # 재고 현황 데이터
+    def get_menu(self): # 해당 스토어의 전체 상품 정보(재고 현황)
         # manage에서 목록으로 받으므로 리스트로 생성하자
         # 인벤토리의 상품들을 메뉴 리스트에 추가
         menu = []
         for product in self.inventory.iloc():
-            p_name = product['product']
-            price = product['price']
-            count = product['count']
-            p_id = product['p_id']
-            menu.append({'p_name': p_name, 'price': int(price), 'count': int(count), 'p_id':p_id})
+            menu.append({'p_name': product['product'],
+                         'price': int(product['price']),
+                         'count': int(product['count']),
+                         'p_id': product['p_id']})
         return menu
 
-    # def get_product(self, p_id):
+    def get_product(self, p_id): # 해당하는 상품의 상품정보
         # p_id 해당하는 상품 반환 인벤토리에서 쿼리 후 .iloc[0] 을 통해 상품 가져올것
+        # 쿼리 결과물이 df인데 html템플릿에서 product.price같은 메서드를 사용하려면 딕셔너리(시리즈)변환 필
+        product = self.inventory[self.inventory['p_id'] == p_id].iloc()[0]
 
-        # return {'p_name': p_name, 'price': int(price), 'count': int(count), 'p_id':p_id}
+        return {'p_name': product['product'],
+                'price': int(product['price']),
+                'count': int(product['count']),
+                'p_id': product['p_id']}
 
 
 #### 스토어 모듈 ####
@@ -98,7 +113,6 @@ def show_list(s_id = None):
         return s_df[s_df['s_id'] == s_id].to_dict('records')
 
 def search_store(s_id):
-    print(s_id)
     if s_id in s_df.index:
         store = s_df.loc[s_id]
         # 인벤토리에서 s_id에 해당하는 상품 쿼리 후 p_df 와 p_id를 기준으로 머지 (인벤토리가 왼쪽이 되야함)
@@ -107,18 +121,18 @@ def search_store(s_id):
         # inventory.join(p_df.set_index(’p_id’), on = ‘p_id’) 조인은 인덱스를 기준으로 잡고 데이터를 합치기때문에 반환된 결과가 인덱스가 초기화 되지 않습니다
         inventory = iv_df[iv_df['s_id'] == s_id]
         inventory = inventory.join(p_df.set_index('p_id'), on = 'p_id')
-        print(inventory)
-        print('='*50)
-        return AiStore(store['name'],
+        store_instance = AiStore(store['name'],
                        store['s_id'],
                        store['locate'],
                        store['products_num'],
                        inventory)
+        update(store_instance)
+        return store_instance
     else:
         print('스토어를 찾지 못했습니다.')
         return None
 
-def get_products_whole():
+def get_products_catalog():
     # 각 col을 key로 각row를 dictionary로 변환하여 리스트로 기록
     return p_df.to_dict('records')
 
