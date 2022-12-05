@@ -43,8 +43,7 @@ def manage(s_id = 'nan'):
         if s_id == 'nan':
             s_id = request.form['sId']
             # Products 전체 쿼리 (리스트)
-            s
-            products = ~
+            products = Products.query.all()
             return render_template('manage.html',
                                     s_id = s_id,
                                     inventory=get_menu(s_id),
@@ -56,11 +55,12 @@ def manage(s_id = 'nan'):
             count = int(request.form['count'])
             set_product(s_id, p_id, price, count)
             # Products 전체 쿼리 (리스트)
-            products = ~
+            products = Products.query.all()
             return render_template('manage.html',
                                     s_id = s_id,
                                     inventory = get_menu(s_id),
-                                    products = products)
+                                    products = products
+                                   )
 
     return render_template('manage.html', s_id = s_id, )
 
