@@ -15,6 +15,10 @@ class AiStore(Base):
         self.locate = locate
         self.products_num = 0
 
+    # repr : print함수를 이용해 객체 내용을 출력해볼 수 있음
+    def __repr__(self):
+        return '<{}, {}, {}, {}>'.format(self.s_id, self.name, self.locate, self.products_num)
+
     def add_product(self):
         self.products_num += 1
 
@@ -37,6 +41,9 @@ class Inventory(Base):
         self.count = count
         self.price = price
         self.s_id = s_id
+
+    def __repr__(self):
+        return '<{}, {}, {}, {}>'.format(self.p_id, self.count, self.price, self.s_id)
 
     def add_count(self, count):
         self.count += count
