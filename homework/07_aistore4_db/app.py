@@ -7,7 +7,7 @@ from wtforms import Form, StringField, PasswordField, TextAreaField, validators
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'aiot'
 
-@app.before_request
+@app.before_request # http요청이 들어올때마다 실행(http요청 핸드러)
 def before_request():
     session.permanent = True
     app.permanent_session_lifetime = datetime.timedelta(minutes=5)
@@ -75,26 +75,34 @@ def board(s_id = 'nan'):
 
     if request.method == 'POST':
         s_id = request.form['sId']
-        ai_store = db_session.get(AiStore, s_id)
-        return render_template('board.html', s_id = s_id, menu = get_menu(ai_store))
-
+        # aistore4_app2와 달리 get_menu가 클래스 메서드가 아니므로 불필요
+        # ai_store = db_session.get(AiStore, s_id)
+        # return render_template('board.html', s_id = s_id, menu = get_menu(ai_store))
+        return render_template('board.html', s_id=s_id, menu=get_menu(s_id))
     if s_id != 'nan':
-        ai_store = db_session.get(AiStore, s_id)
-        return render_template('board.html',
-                               s_id=s_id, menu = get_menu(ai_store))
+        # 위와 상동
+        # ai_store = db_session.get(AiStore, s_id)
+        # return render_template('board.html', s_id=s_id, menu = get_menu(ai_store))
+        return render_template('board.html', s_id=s_id, menu = get_menu(s_id))
+
     else:
-        return render_template('board.html',
-                               s_id=s_id,)
+        return render_template('board.html', s_id=s_id,)
 
 @app.route("/buy/<s_id>/<p_id>", methods=['POST', 'GET'])
 def buy(s_id, p_id):
     if 'buy_product' not in session:
         inventory = db_session.get(Inventory,(p_id,s_id))
+        # aistore4_app2와 달리 buy_product 클래스 메서드가 없으므로, db에서 가져오자.
         session['buy_product'] = {'p_name': inventory.product.name, 'price': inventory.price}
 
+    # 기본 알림값 초기화(미실행)
     alert = False
+
+    # 세션 카운트값 초기화
     if 'count' not in session:
         session['count'] = 1
+
+    # 값이 들어올 경우, 즉 구매페이지를 통한 접근 케이스
     if request.method == 'POST':
         if request.form.get('plus') == '+':
             session['count'] +=1
@@ -103,12 +111,13 @@ def buy(s_id, p_id):
             if session['count'] > 1:
                 session['count'] -=1
 
-        else:
+        else: # 위 +/- 버튼이 아니므로 구매 버튼이 됨,
             if buy_product(p_id, s_id, session['count']):
+                # 불린값 반환, true 구매 성공시 페이지 리다이렉트
                 return redirect(url_for('board', s_id = s_id))
-            else:
+            else: # 구매 실패시 alert값을 참으로 변경하여 템플릿에서 알림 동작(페이지 새로 고침 안해도 됨)
                 alert = True
-
+    # 최초 인덱스를 통한 접속 케이스
     return render_template('buy.html',
                            s_id=s_id, p_id = p_id,
                            product = session['buy_product'],
@@ -116,6 +125,7 @@ def buy(s_id, p_id):
                            alert = alert
                            )
 
+# http요청 결과가 브라우저에 응답한 다음 실행
 @app.teardown_request
 def shutdown_session(exception=None):
     db_session.remove()
