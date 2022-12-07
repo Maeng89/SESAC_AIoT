@@ -17,7 +17,7 @@ class AiStore(Base):
 
     # repr : print함수를 이용해 객체 내용을 출력해볼 수 있음
     def __repr__(self):
-        return '<{}, {}, {}, {}>'.format(self.s_id, self.name, self.locate, self.products_num)
+        return f'<{self.s_id}, {self.name}, {self.locate}, {self.products_num}>'
 
     def add_product(self):
         self.products_num += 1
@@ -43,7 +43,7 @@ class Inventory(Base):
         self.s_id = s_id
 
     def __repr__(self):
-        return '<{}, {}, {}, {}>'.format(self.p_id, self.count, self.price, self.s_id)
+        return f'<{self.p_id}, {self.count}, {self.price}, {self.s_id}>'
 
     def add_count(self, count):
         self.count += count
@@ -64,18 +64,16 @@ def create_store(s_id, s_name, locate):
         return print(f'등록 실패, {s_id} 이미 등록된 스토어 아이디 입니다.')
 
 
-
 def show_list(s_id = None):
-    if s_id is None: # 최초 접속 케이스 only(미입력 처리 안됨)
+    if s_id is None: # 최초 인덱스를 통한 접속 케이스 only(미입력 처리 안됨)
         # AiStore 전체 쿼리후 리스트로 반환
         stores = AiStore.query.all()
-        # stores = list(AiStore.query.all())
         return stores
     else:
         # s_id에 해당하는 AiStore를 리스트로 반환
         # 쿼리 사용 또는 get함수 사용 (AiStore가 하나여도 하나만 있는 리스트로 반환)
-        stores = AiStore.query.filter(AiStore.s_id == s_id)
-        # stores = list(AiStore.query.filter(AiStore.s_id == s_id))
+        stores = AiStore.query.filter(AiStore.s_id == s_id).all()
+        # stores = db_session.get(AiStore, s_id) # get함수는 리스트로 반환 안함
         return stores
 
 
@@ -86,32 +84,34 @@ def get_menu(s_id): # 해당 스토어의 전체 상품 정보(재고 현황)
     # Inventory의 product 컬럼은 Products와 관계가 형성 되있으므로 자동조인됨
     # 관계 사용 안할시 다음과 같은 조인방식으로 가능
     # invs = db_session.query(Inventory.p_id, Inventory.price, Inventory.count, Products.product).join(Products, Inventory.p_id == Products.p_id)
-    sid_inv = Inventory.query.filter(Inventory.s_id == s_id)
-
+    sid_inv = Inventory.query.filter(Inventory.s_id == s_id).all()
     # menu 는 쿼리된 inventory의 각각의 상품을 딕셔너리로 보관하는 리스트
     # 'p_id','p_name','price','count' 의 키를 가지는 딕셔너리
     # 'p_name' 의 값은 inventory 하나의 인스턴스에서 .product.name 컬럼값으로 할당(inventory orm의 자동조인된 porduct컬럼의 name 컬럼)
-    print(sid_inv)
-    print(list(sid_inv))
     menu = []
-    menu.append({ 'p_id':sid_inv['p_id'], 'p_name':sid_inv.product.name, 'price':sid_inv['price'], 'count':sid_inv['count'] })
+    for inv in sid_inv:
+        menu.append({ 'p_id':inv.p_id, 'p_name':inv.product.name, 'price':inv.price, 'count':inv.count })
     return menu
 
 
 def set_product(s_id, p_id, price, count):
-    # 상품이 있는경우 가격및 재고 변경
-    # 상품이 없는경우 상품 생성후 추가
+    # 상품이 있는 경우 가격 및 재고 변경
+    # 상품이 없는 경우 상품 생성후 추가
 
     # 파라미터로 입력된 s_id, p_id 값을 가지는 Inventory 쿼리 또는 get
-    # ~
-
+    inventory = db_session.get(Inventory, (p_id, s_id))
+    if inventory is not None:
     # 쿼리된 Inventory가 있으면 입력된 가격으로 가격 변경및 입력된 재고만큼 재고 추가
+        inventory.add_count(count)
+        inventory.price = price
+    else :
     # 없으면 입력된 가격 및 재고로 새로운 Inventory orm 생성후 데이터베이스에 add
+        new_inv = Inventory(p_id=p_id, price=price, count=count)
+        db_session.add(new_inv)
     # 없을때 상품 생성후 스토어의 product_num도 +1 (함수 사용)
-    # ~
+        AiStore.add_product()
 
-    # 최종 커밋하여 데이터베이스 적용
-    # ~
+    db_session.commit()
     return None
 
 def buy_product(p_id, s_id, count):
@@ -121,7 +121,7 @@ def buy_product(p_id, s_id, count):
     # 커밋하여 데이터베이스 적용
     inventory = db_session.get(Inventory, (p_id, s_id))
 
-    if inventory.count > count:
+    if inventory.count >= count:
         inventory.sub_count(count)
         db_session.commit()
         return True
