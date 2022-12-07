@@ -95,24 +95,21 @@ def get_menu(s_id): # 해당 스토어의 전체 상품 정보(재고 현황)
 
 
 def set_product(s_id, p_id, price, count):
-    # 상품이 있는 경우 가격 및 재고 변경
-    # 상품이 없는 경우 상품 생성후 추가
-
     # 파라미터로 입력된 s_id, p_id 값을 가지는 Inventory 쿼리 또는 get
     inventory = db_session.get(Inventory, (p_id, s_id))
-    if inventory is not None:
+    if inventory is not None:  # 상품이 있는 경우 가격 및 재고 변경
     # 쿼리된 Inventory가 있으면 입력된 가격으로 가격 변경및 입력된 재고만큼 재고 추가
         inventory.add_count(count)
         inventory.price = price
-    else :
+    else : # 상품이 없는 경우 상품 생성후 추가
     # 없으면 입력된 가격 및 재고로 새로운 Inventory orm 생성후 데이터베이스에 add
-        new_inv = Inventory(p_id=p_id, price=price, count=count)
+        new_inv = Inventory(p_id=p_id, price=price, count=count, s_id=s_id)
         db_session.add(new_inv)
     # 없을때 상품 생성후 스토어의 product_num도 +1 (함수 사용)
-        AiStore.add_product()
-
+        store = db_session.get(AiStore, s_id)
+        store.add_product()
+    # db 업데이트
     db_session.commit()
-    return None
 
 def buy_product(p_id, s_id, count):
     # 입력된 재고 이상이 있을때 상품 구매
