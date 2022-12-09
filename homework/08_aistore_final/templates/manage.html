@@ -21,6 +21,14 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
+        {% if alert %}
+        <div class="row mt-3 justify-content-center">
+            <div class="col-4 alert alert-danger" role="alert">
+                입력 정보가 유효하지 않습니다.
+            </div>
+        </div>
+        {% endif %}
+
     {% else %}
     <div class="row align-items-center g-lg-5 py-5">
         <div class="col-lg-7 text-center text-lg-start">

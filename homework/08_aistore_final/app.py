@@ -40,22 +40,34 @@ def stores():
 
 @app.route("/manage/<s_id>", methods=['POST', 'GET'])
 def manage(s_id = 'nan'):
+    # 기본 알림값 초기화(미실행)
+    alert = False
+
     if request.method == 'POST':
+
         if s_id == 'nan':
             s_id = request.form['sId']
-            # Products 전체 쿼리 (리스트)
-            products = Products.query.all()
-            return render_template('manage.html',
-                                    s_id = s_id,
-                                    inventory=get_menu(s_id),
-                                    products=products
-                                    )
+            s_pw = request.form['sPassword']
+            login_store = db_session.get(AiStore, s_id)
+            print(login_store, type(login_store))
+            print(login_store.password)
+
+            if login_store.password == s_pw:
+                products = Products.query.all()
+                return render_template('manage.html',
+                                       s_id=s_id,
+                                       inventory=get_menu(s_id),
+                                       products=products
+                                       )
+            else:
+                alert = True
+                return render_template('manage.html', s_id='nan', alert=alert)
+
         else:
             p_id = request.form['pId']
             price = request.form['price']
             count = int(request.form['count'])
             set_product(s_id, p_id, price, count)
-            # Products 전체 쿼리 (리스트)
             products = Products.query.all()
             return render_template('manage.html',
                                     s_id = s_id,
@@ -63,7 +75,8 @@ def manage(s_id = 'nan'):
                                     products = products
                                    )
 
-    return render_template('manage.html', s_id = s_id, )
+
+    return render_template('manage.html', s_id = s_id, alert=alert)
 
 @app.route("/board/<s_id>", methods=['POST', 'GET'])
 def board(s_id = 'nan'):
@@ -80,7 +93,6 @@ def board(s_id = 'nan'):
     if request.method == 'POST':
         s_id = request.form['sId']
         s_pw = request.form['sPassword']
-        # login_store = AiStore.query.filter(AiStore.s_id == s_id, AiStore.password == s_pw).all()
         login_store = db_session.get(AiStore, s_id)
         print(login_store, type(login_store))
         print(login_store.password)
