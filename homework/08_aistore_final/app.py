@@ -80,12 +80,20 @@ def board(s_id = 'nan'):
     if request.method == 'POST':
         s_id = request.form['sId']
         s_pw = request.form['sPassword']
-        login_store = db_session.get(Inventory, (s_id, s_pw))
-        if login_store :
+        # login_store = AiStore.query.filter(AiStore.s_id == s_id, AiStore.password == s_pw).all()
+        login_store = db_session.get(AiStore, s_id)
+        print(login_store, type(login_store))
+        print(login_store.password)
+
+        if login_store.password == s_pw:
             return render_template('board.html', s_id=s_id, menu=get_menu(s_id))
         else:
             alert = True
             return render_template('board.html', s_id='nan', alert=alert)
+        
+    if s_id != 'nan': # login스토어가 구매후 재접속되는 페이지
+        return render_template('board.html', s_id=s_id, menu=get_menu(s_id))
+        
     else:
         return render_template('board.html', s_id=s_id, alert=alert)
 
