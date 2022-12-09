@@ -15,3 +15,5 @@ p_df.to_sql('products', con=engine, if_exists='replace', index= False)
 
 iv_df = pd.read_csv('./static/inventory.csv')
 iv_df.to_sql('inventory', con=engine, if_exists='replace', index= False)
+
+print('데이터 베이스 리셋/생성 완료')
