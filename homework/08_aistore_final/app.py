@@ -74,19 +74,20 @@ def board(s_id = 'nan'):
     if 'buy_product' in session:
         del session['buy_product']
 
+    # 기본 알림값 초기화(미실행)
+    alert = False
+
     if request.method == 'POST':
         s_id = request.form['sId']
         s_pw = request.form['sPassword']
-        if s_id in AiStore.s_id and s_pw == AiStore.password:
-            print('입력 정보가 유효합니다.')
+        login_store = db_session.get(Inventory, (s_id, s_pw))
+        if login_store :
             return render_template('board.html', s_id=s_id, menu=get_menu(s_id))
         else:
-            print('입력 정보가 유효하지 않습니다.')
-    if s_id != 'nan':
-        return render_template('board.html', s_id=s_id, menu = get_menu(s_id))
-
+            alert = True
+            return render_template('board.html', s_id='nan', alert=alert)
     else:
-        return render_template('board.html', s_id=s_id,)
+        return render_template('board.html', s_id=s_id, alert=alert)
 
 @app.route("/buy/<s_id>/<p_id>", methods=['POST', 'GET'])
 def buy(s_id, p_id):
@@ -117,7 +118,7 @@ def buy(s_id, p_id):
                 return redirect(url_for('board', s_id = s_id))
             else: # 구매 실패시 alert값을 참으로 변경하여 템플릿에서 알림 동작(페이지 새로 고침 안해도 됨)
                 alert = True
-    # 최초 인덱스를 통한 접속 케이스
+
     return render_template('buy.html',
                            s_id=s_id, p_id = p_id,
                            product = session['buy_product'],
