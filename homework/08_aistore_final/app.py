@@ -23,7 +23,8 @@ def sregister():
         s_id = request.form['sId']
         s_name = request.form['sName']
         locate = request.form['locate']
-        create_store(s_id, s_name, locate)
+        password = request.form['sPassword']
+        create_store(s_id, s_name, locate, password)
         return redirect('/')
 
     return render_template('sregister.html')
@@ -75,14 +76,13 @@ def board(s_id = 'nan'):
 
     if request.method == 'POST':
         s_id = request.form['sId']
-        # aistore4_app2와 달리 get_menu가 클래스 메서드가 아니므로 불필요
-        # ai_store = db_session.get(AiStore, s_id)
-        # return render_template('board.html', s_id = s_id, menu = get_menu(ai_store))
-        return render_template('board.html', s_id=s_id, menu=get_menu(s_id))
+        s_pw = request.form['sPassword']
+        if s_id in AiStore.s_id and s_pw == AiStore.password:
+            print('입력 정보가 유효합니다.')
+            return render_template('board.html', s_id=s_id, menu=get_menu(s_id))
+        else:
+            print('입력 정보가 유효하지 않습니다.')
     if s_id != 'nan':
-        # 위와 상동
-        # ai_store = db_session.get(AiStore, s_id)
-        # return render_template('board.html', s_id=s_id, menu = get_menu(ai_store))
         return render_template('board.html', s_id=s_id, menu = get_menu(s_id))
 
     else:
