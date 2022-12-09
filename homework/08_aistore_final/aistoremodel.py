@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from database import Base, db_session
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, deferred
+# password 엔터티를 쿼리할 때가 아니라 직접 액세스할 때만 열을 로드하기 위해 사용,
+from sqlalchemy_utils import PasswordType
 
 class AiStore(Base):
     __tablename__ = 'stores'
@@ -8,12 +10,17 @@ class AiStore(Base):
     name = Column(String(20))
     locate = Column(String(30))
     products_num = Column(Integer)# 숫자형 컬럼 생성
+    password = deferred(Column(PasswordType(max_length=20,
+                                            schemes=["pbkdf2_sha512", "md5_crypt"],
+                                            deprecated=["md5_crypt"])))
+    # pbkdf2_sha512 는 암호 해시에 사용, md5_crypt 는 패스워드 비교에 사용
 
-    def __init__(self, s_id, name, locate):
+    def __init__(self, s_id, name, locate, password):
         self.s_id = s_id
         self.name = name
         self.locate = locate
         self.products_num = 0
+        self.password = password
 
     # repr : print함수를 이용해 객체 내용을 출력해볼 수 있음
     def __repr__(self):
@@ -52,11 +59,13 @@ class Inventory(Base):
         self.count -= count
 
 
-def create_store(s_id, s_name, locate):
+def create_store(s_id, s_name, locate, password):
     # s_id 가 존재 하지 않는 경우만 AiStore 인스턴스 생성후 데이터베이스에 추가
     # 커밋하여 데이터베이스 적용
+    print(db_session.get(AiStore, s_id))
+    print('='*50)
     if db_session.get(AiStore, s_id) is None:
-        store = AiStore(s_id=s_id, name=s_name, locate=locate)
+        store = AiStore(s_id=s_id, name=s_name, locate=locate, password=password)
         db_session.add(store)
         db_session.commit()
         return print('스토어 등록 성공')
@@ -68,6 +77,7 @@ def show_list(s_id = None):
     if s_id is None: # 최초 인덱스를 통한 접속 케이스 only(미입력 처리 안됨)
         # AiStore 전체 쿼리후 리스트로 반환
         stores = AiStore.query.all()
+        print(stores)
         return stores
     else:
         # s_id에 해당하는 AiStore를 리스트로 반환
