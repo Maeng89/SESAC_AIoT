@@ -15,5 +15,5 @@ while True:
         break
     print(data.decode('utf-8'))
 
-    client_socket.sendall('recive'.encode())
+    client_socket.sendall('receive'.encode())
 client_socket.close()
