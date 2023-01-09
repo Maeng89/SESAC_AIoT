@@ -25,8 +25,9 @@ def monitor():
     if 'd' not in session:
         session['d'] = get_device(collection, DID)
     device = session['d']
+    print(device['sensor'][-1]) # 가장 마지막(최근) 데이터
     m = get_monitor(device['sensor'][-1])
-    g = get_growth(device['growth'])
+    g = get_growth(int(device['sensor'][-1]['growth_level']))
     return render_template('monitor.html', m = m, growth = g)
 
 @app.route("/board/<type>", methods=['POST', 'GET'])
@@ -50,13 +51,14 @@ def shutdown_session(exception=None):
 
 def get_growth(growth):
     if growth == 0:
-        return '씨앗'
+        return '0주차 씨앗'
     elif growth == 1:
-        return '새싹'
+        return '1주차 새싹'
     elif growth == 2:
-        return '성장'
+        return '2주차 성장'
     elif growth == 3:
-        return '성숙'
+        return '3주차 성숙'
+
 def get_monitor(sensor):
     if sensor['water_level'] == 0:
         water_level = '부족상태'
@@ -71,7 +73,7 @@ def get_monitor(sensor):
     else:
         fan = '비회전'
     return {
-        'temp' : '{}℃'.format(sensor['temperature']),
+        'temp' : '{}℃'.format(sensor['temp']),
         'humidity' : '{}%'.format(sensor['humidity']),
         'water_level' : '{}'.format(water_level),
         'ph' : '{}pH'.format(sensor['ph']),
@@ -83,8 +85,8 @@ def get_board(device):
     cnt = len(device['sensor'])
     if cnt >20:
         cnt = 20
-        sensors = device['sensor'][-20:]
-        sensors.reverse()
+        sensors = device['sensor'][-20:] # 최근 20개
+        sensors.reverse() # 최근 순으로 정렬
         timeline = [sensor['update_time'] for sensor in sensors][-20:]
 
     else:
@@ -92,7 +94,7 @@ def get_board(device):
         sensors.reverse()
         timeline = [sensor['update_time'] for sensor in sensors]
 
-    print(sensors)
+    #print(sensors)
     msensors = [get_monitor(sensor) for sensor in sensors]
 
     return msensors, timeline
@@ -108,7 +110,7 @@ def get_chart(device, type):
         sensors.reverse()
 
     if type == 'temp':
-        return [sensor['temperature'] for sensor in sensors]
+        return [sensor['temp'] for sensor in sensors]
     elif type == 'humidity':
         return [sensor['humidity'] for sensor in sensors]
     elif type == 'ph':

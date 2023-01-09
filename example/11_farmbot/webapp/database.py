@@ -16,16 +16,16 @@ def get_device(d_id):
     if device.exists:
         return device.to_dict()
 
-def create_device(d_id):
-    doc_ref = db.collection('device').document(d_id)
-    if not doc_ref.get().exists:
-        device = {d_id: {
-            'id': d_id,
-            'is_running': False,
-            'manufacture_date': '20221213',
-            'sensor': []
-        }}
-        doc_ref.set(device)
+# def create_device(d_id):
+#     doc_ref = db.collection('device').document(d_id)
+#     if not doc_ref.get().exists:
+#         device = {d_id: {
+#             'id': d_id,
+#             'is_running': False,
+#             'manufacture_date': '20221213',
+#             'sensor': []
+#         }}
+#         doc_ref.set(device)
 
 
 def upload_sensor(d_id, sensor):
