@@ -119,4 +119,4 @@ def get_chart(device, type):
         return [sensor['turbidity'] for sensor in sensors]
 
 if __name__ == '__main__':
-    app.run('0.0.0.0',9999, debug=True)
+    app.run('0.0.0.0', 9999, debug=True)
